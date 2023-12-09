@@ -1,37 +1,58 @@
-let bgImage; // Declare a variable to hold the image
-let input; // Declare a variable for the text input
+=let bgImage;
+let input, button;
+let displayText = '';
+let displayTextTimeout;
 
 function preload() {
-  // Load the image and store it in the variable
   bgImage = loadImage('background.png'); // Make sure this path is correct
 }
 
 function setup() {
-  createCanvas(1800, 1250); // Set the size of the canvas
-  background(bgImage); // Set the image as the background
+  createCanvas(1800, 1250);
   
-  // Create the text input and position it below the Venn diagram
   input = createInput('');
-  input.position(width / 2 - input.width / 2, height - 100); // Adjust as necessary for your layout
+  input.position(width / 2 - input.width / 2, height - 150);
 
-  // Draw the Venn diagram
-  drawVennDiagram();
-}
-
-function drawVennDiagram() {
-  // Draw two overlapping circles for the Venn diagram
-  fill(255, 200); // Set the fill color to white with some transparency
-  stroke(0); // Set the stroke color to black
-  strokeWeight(2); // Set the stroke weight
-  
-  // Draw the left circle
-  ellipse(700, 625, 550, 550);
-
-  // Draw the right circle
-  ellipse(1100, 625, 550, 550);
+  button = createButton('submit');
+  button.position(input.x + input.width, height - 150);
+  button.mousePressed(submitText);
 }
 
 function draw() {
-  // No need to redraw the background or the Venn diagram if they are static
-  // The draw function can be left empty if there is no animation required
+  // Redraw the background and the Venn diagram to "clear" the canvas
+  background(bgImage);
+  drawVennDiagram();
+
+  // Display the text if displayText is not an empty string
+  if (displayText !== '') {
+    fill(0);
+    noStroke();
+    textSize(32);
+    textAlign(CENTER, CENTER);
+    text(displayText, width / 2, height - 100); // Adjust Y position as needed
+  }
 }
+
+function drawVennDiagram() {
+  fill(255, 200);
+  stroke(0);
+  strokeWeight(2);
+  
+  ellipse(700, 625, 550, 550);
+  ellipse(1100, 625, 550, 550);
+}
+
+function submitText() {
+  displayText = input.value(); // Get the value from the input
+  // Display the text and then clear it after 5 seconds
+  if(displayTextTimeout) clearTimeout(displayTextTimeout); // Clear the previous timeout if it exists
+  displayTextTimeout = setTimeout(() => {
+    displayText = ''; // Clear the text
+    redraw(); // Redraw the canvas to update the view
+  }, 5000);
+  
+  redraw(); // Make sure to update the display immediately after submitting
+}
+
+// If you are not constantly redrawing your canvas, you might need to call redraw() to see changes
+noLoop();
